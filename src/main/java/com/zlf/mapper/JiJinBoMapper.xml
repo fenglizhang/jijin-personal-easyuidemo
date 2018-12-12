@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zlf.dao.JiJinBoMapper">
+	<resultMap id="BaseResultMap" type="com.zlf.bo.JiJinBo">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="jiJinName" property="jiJinName" jdbcType="VARCHAR" />
+		<result column="jiJinCode" property="jiJinCode" jdbcType="VARCHAR" />
+		<result column="jiJinTime" property="jiJinTime" jdbcType="TIMESTAMP" />
+		<result column="dailyIncreases" property="dailyIncreases" jdbcType="DOUBLE" />
+		<result column="monthNum" 	property="monthNum" jdbcType="VARCHAR" />
+		<result column="weekNum" 	property="weekNum" 	jdbcType="VARCHAR" />
+		<result column="upFlag" 	property="upFlag" 	jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, jiJinName,jiJinCode, jiJinTime, dailyIncreases, monthNum, weekNum, upFlag
+	</sql>
+	
+
+	<insert id="insertSelective" parameterType="com.zlf.bo.JiJinBo">
+		insert into selfjijin
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			
+			<if test="jiJinName != null">
+				jiJinName,
+			</if>
+			<if test="jiJinCode != null">
+				jiJinCode,
+			</if>
+			<if test="jiJinTime != null">
+				jiJinTime,
+			</if>
+			<if test="dailyIncreases != null">
+				dailyIncreases,
+			</if>
+			<if test="monthNum != null">
+				monthNum,
+			</if>
+			<if test="weekNum != null">
+				weekNum,
+			</if>
+			<if test="upFlag != null">
+				upFlag,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			
+			<if test="jiJinName != null">
+				#{jiJinName,jdbcType=VARCHAR},
+			</if>
+			<if test="jiJinCode != null">
+				#{jiJinCode,jdbcType=VARCHAR},
+			</if>
+			<if test="jiJinTime != null">
+				#{jiJinTime},
+			</if>
+			<if test="dailyIncreases != null">
+				#{dailyIncreases,jdbcType=DOUBLE},
+			</if>
+			<if test="monthNum != null">
+				#{monthNum,jdbcType=VARCHAR},
+			</if>
+			<if test="weekNum != null">
+				#{weekNum,jdbcType=VARCHAR},
+			</if>
+			<if test="upFlag != null">
+				#{upFlag,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="com.zlf.bo.JiJinBo">
+		update selfjijin
+		<set>
+			<if test="jiJinName != null">
+				jiJinName = #{jiJinName,jdbcType=VARCHAR},
+			</if>
+			<if test="jiJinCode != null">
+				jiJinCode = #{jiJinCode,jdbcType=VARCHAR},
+			</if>
+			<if test="jiJinTime != null">
+				jiJinTime = #{jiJinTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="dailyIncreases != null">
+				dailyIncreases = #{dailyIncreases,jdbcType=DOUBLE},
+			</if>
+			<if test="monthNum != null">
+				monthNum = #{monthNum,jdbcType=VARCHAR},
+			</if>
+			<if test="weekNum != null">
+				weekNum = #{weekNum,jdbcType=VARCHAR},
+			</if>
+			<if test="upFlag != null">
+				upFlag = #{upFlag,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+
+<!-- 	按条件分页查询 -->
+	<select id="selectByConditionsAndPage" resultMap="BaseResultMap"
+		parameterType="com.zlf.bo.JiJinBo">
+		select
+		<include refid="Base_Column_List" />
+		from selfjijin
+		<where>
+			<if test="jiJinCode != null">
+				jiJinCode=#{jiJinCode,jdbcType=VARCHAR}
+			</if>
+			<if test="jiJinStartTime != null">
+        			<![CDATA[and jiJinTime>=#{jiJinStartTime,jdbcType=TIMESTAMP}]]>
+			</if>
+			<if test="jiJinEndTime != null">
+        			<![CDATA[and jiJinTime<=#{jiJinEndTime,jdbcType=TIMESTAMP}]]>
+			</if>
+		</where>
+		order by id asc
+		limit #{page1},#{page2} 
+	</select>
+	
+<!-- 	按条件查询总条数 -->
+	<select id="countSizeByConditions" resultMap="BaseResultMap"
+		parameterType="com.zlf.bo.JiJinBo">
+		select
+		<include refid="Base_Column_List" />
+		from selfjijin
+		<where>
+			<if test="jiJinCode != null">
+				jiJinCode=#{jiJinCode,jdbcType=VARCHAR}
+			</if>
+			<if test="jiJinStartTime != null">
+        			<![CDATA[and jiJinTime>=#{jiJinStartTime,jdbcType=TIMESTAMP}]]>
+			</if>
+			<if test="jiJinEndTime != null">
+        			<![CDATA[and jiJinTime<=#{jiJinEndTime,jdbcType=TIMESTAMP}]]>
+			</if>
+			<if test="monthNum != null">
+				monthNum=#{monthNum,jdbcType=VARCHAR}
+			</if>
+			<if test="weekNum != null">
+				weekNum=#{weekNum,jdbcType=VARCHAR}
+			</if>
+			<if test="upFlag != null">
+				upFlag=#{upFlag,jdbcType=VARCHAR}
+			</if>
+		</where>
+	</select>
+<!-- 	获取基金名称下拉值 -->
+	<select id="getJiJinNameList" resultMap="BaseResultMap">
+		select distinct jiJinName,jiJinCode from selfjijin
+	</select>
+<!-- 	新增判断去重复 -->
+	<select id="judgeAddRepeat" parameterType="com.zlf.bo.JiJinBo" resultMap="BaseResultMap">
+		select id from selfjijin
+		<where>
+			<if test="jiJinCode != null">
+				jiJinCode=#{jiJinCode,jdbcType=VARCHAR}
+			</if>
+			<if test="jiJinTime != null">
+				and jiJinTime=#{jiJinTime,jdbcType=TIMESTAMP}
+			</if>
+		</where>
+	</select>
+</mapper>
